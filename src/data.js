@@ -125,19 +125,19 @@ export function initData() {
     }
 
     const [field, order] = sort.split(":");
-    const sorted = [...items].sort((left, right) => {
+    const direction = order === "down" ? -1 : 1;
+
+    return [...items].sort((left, right) => {
       if (left[field] > right[field]) {
-        return 1;
+        return direction;
       }
 
       if (left[field] < right[field]) {
-        return -1;
+        return -direction;
       }
 
       return 0;
     });
-
-    return order === "down" ? sorted.reverse() : sorted;
   };
 
   const applyQuery = (items, query) => {
