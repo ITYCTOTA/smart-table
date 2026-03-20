@@ -6,6 +6,18 @@ export function initData() {
   let lastResult;
   let lastQuery;
 
+  const requestJsonSync = (url) => {
+    const request = new XMLHttpRequest();
+    request.open("GET", url, false);
+    request.send();
+
+    if (request.status < 200 || request.status >= 300) {
+      return null;
+    }
+
+    return JSON.parse(request.responseText);
+  };
+
   const mapRecords = (data) =>
     data.map((item) => ({
       id: item.receipt_id,
@@ -21,6 +33,15 @@ export function initData() {
         fetch(`${BASE_URL}/sellers`).then((response) => response.json()),
         fetch(`${BASE_URL}/customers`).then((response) => response.json()),
       ]);
+    }
+
+    return { sellers, customers };
+  };
+
+  const getIndexesSync = () => {
+    if (!sellers || !customers) {
+      sellers = requestJsonSync(`${BASE_URL}/sellers`);
+      customers = requestJsonSync(`${BASE_URL}/customers`);
     }
 
     return { sellers, customers };
@@ -55,8 +76,38 @@ export function initData() {
     return lastResult;
   };
 
+  const getRecordsSync = (query, isUpdated = false) => {
+    getIndexesSync();
+
+    const qs = new URLSearchParams(query);
+    const nextQuery = qs.toString();
+
+    if (lastQuery === nextQuery && !isUpdated) {
+      return lastResult;
+    }
+
+    const records = requestJsonSync(`${BASE_URL}/records?${nextQuery}`);
+
+    if (!records) {
+      return {
+        total: 0,
+        items: [],
+      };
+    }
+
+    lastQuery = nextQuery;
+    lastResult = {
+      total: records.total,
+      items: mapRecords(records.items),
+    };
+
+    return lastResult;
+  };
+
   return {
     getIndexes,
+    getIndexesSync,
     getRecords,
+    getRecordsSync,
   };
 }

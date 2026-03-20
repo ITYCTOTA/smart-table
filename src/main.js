@@ -25,14 +25,20 @@ function collectState() {
   };
 }
 
-async function render(action) {
-  const state = collectState();
+function buildQuery(state, action) {
   let query = {};
 
   query = applySearching(query, state, action);
   query = applyFiltering(query, state, action);
   query = applySorting(query, state, action);
   query = applyPagination(query, state, action);
+
+  return query;
+}
+
+async function render(action) {
+  const state = collectState();
+  const query = buildQuery(state, action);
 
   const { total, items } = await api.getRecords(query);
 
@@ -74,10 +80,15 @@ const applySearching = initSearching("search");
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
 
-const indexes = await api.getIndexes();
+const indexes = api.getIndexesSync();
 
 updateIndexes({
   searchBySeller: indexes.sellers,
 });
 
-await render();
+const initialState = collectState();
+const initialQuery = buildQuery(initialState);
+const initialResult = api.getRecordsSync(initialQuery);
+
+updatePagination(initialResult.total, initialQuery);
+sampleTable.render(initialResult.items);
