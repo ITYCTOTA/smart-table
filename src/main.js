@@ -88,5 +88,11 @@ const init = async () => {
   });
 };
 
-await init();
-await render();
+const initialState = collectState();
+const initialQuery = buildQuery(initialState);
+const initialResult = api.getRecordsSync(initialQuery);
+
+updatePagination(initialResult.total, initialQuery);
+sampleTable.render(initialResult.items);
+
+init().then(render);

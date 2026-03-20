@@ -1,4 +1,33 @@
 export function initFiltering(elements) {
+  const normalizeDateFilter = (value) => {
+    const raw = value.trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    if (raw.includes("-")) {
+      const [year = "", month = "", day = ""] = raw.split("-");
+      const normalizedYear = (year + "****").slice(0, 4).replace(/\s/g, "*");
+      const normalizedMonth = (month + "**").slice(0, 2).replace(/\s/g, "*");
+      const normalizedDay = (day + "**").slice(0, 2).replace(/\s/g, "*");
+      return `${normalizedYear}-${normalizedMonth}-${normalizedDay}`;
+    }
+
+    const digits = raw.replace(/\D/g, "");
+    if (!digits) {
+      return "";
+    }
+
+    if (digits.length <= 2) {
+      const month = (digits + "**").slice(0, 2);
+      return `****-${month}-**`;
+    }
+
+    const year = (digits + "****").slice(0, 4);
+    return `${year}-**-**`;
+  };
+
   const updateIndexes = (indexes) => {
     Object.keys(indexes).forEach((elementName) => {
       const element = elements[elementName];
@@ -40,7 +69,8 @@ export function initFiltering(elements) {
       }
 
       if (["INPUT", "SELECT"].includes(element.tagName) && element.value) {
-        const value = element.value.trim();
+        const value =
+          element.name === "date" ? normalizeDateFilter(element.value) : element.value.trim();
 
         if (value) {
           filter[`filter[${element.name}]`] = value;
