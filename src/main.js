@@ -36,11 +36,11 @@ function buildQuery(state, action) {
   return query;
 }
 
-function render(action) {
+async function render(action) {
   const state = collectState();
   const query = buildQuery(state, action);
 
-  const { total, items } = api.getRecordsSync(query);
+  const { total, items } = await api.getRecords(query);
 
   updatePagination(total, query);
   sampleTable.render(items);
@@ -80,10 +80,12 @@ const applySearching = initSearching("search");
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
 
-const indexes = api.getIndexesSync();
+const init = async () => {
+  const indexes = await api.getIndexes();
 
-updateIndexes({
-  searchBySeller: indexes.sellers,
-});
+  updateIndexes({
+    searchBySeller: indexes.sellers,
+  });
+};
 
-render();
+init().then(render);
