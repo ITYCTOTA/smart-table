@@ -1,23 +1,4 @@
 export function initFiltering(elements) {
-  const normalizeDateFilter = (value) => {
-    const chars = value.trim().replace(/[^0-9*]/g, "");
-
-    if (!chars) {
-      return "";
-    }
-
-    const mask = Array(8).fill("*");
-
-    chars
-      .slice(0, 8)
-      .split("")
-      .forEach((char, index) => {
-        mask[index] = char;
-      });
-
-    return `${mask.slice(0, 4).join("")}-${mask.slice(4, 6).join("")}-${mask.slice(6, 8).join("")}`;
-  };
-
   const updateIndexes = (indexes) => {
     Object.keys(indexes).forEach((elementName) => {
       const element = elements[elementName];
@@ -59,8 +40,7 @@ export function initFiltering(elements) {
       }
 
       if (["INPUT", "SELECT"].includes(element.tagName) && element.value) {
-        const value =
-          element.name === "date" ? normalizeDateFilter(element.value) : element.value.trim();
+        const value = element.value.trim();
 
         if (value) {
           filter[`filter[${element.name}]`] = value;

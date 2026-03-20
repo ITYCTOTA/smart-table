@@ -36,11 +36,11 @@ function buildQuery(state, action) {
   return query;
 }
 
-async function render(action) {
+function render(action) {
   const state = collectState();
   const query = buildQuery(state, action);
 
-  const { total, items } = await api.getRecords(query);
+  const { total, items } = api.getRecordsSync(query);
 
   updatePagination(total, query);
   sampleTable.render(items);
@@ -86,9 +86,4 @@ updateIndexes({
   searchBySeller: indexes.sellers,
 });
 
-const initialState = collectState();
-const initialQuery = buildQuery(initialState);
-const initialResult = api.getRecordsSync(initialQuery);
-
-updatePagination(initialResult.total, initialQuery);
-sampleTable.render(initialResult.items);
+render();
