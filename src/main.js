@@ -74,12 +74,10 @@ const applySearching = initSearching("search");
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
 
-async function init() {
-  const indexes = await api.getIndexes();
+const indexes = await api.getIndexes();
 
-  updateIndexes({
-    searchBySeller: indexes.sellers,
-  });
-}
+updateIndexes({
+  searchBySeller: indexes.sellers,
+});
 
-init().then(render);
+await render();
