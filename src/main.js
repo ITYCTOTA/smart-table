@@ -88,4 +88,5 @@ const init = async () => {
   });
 };
 
-init().then(render);
+await init();
+await render();
